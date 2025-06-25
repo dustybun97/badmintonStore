@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model cart_items {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String?   @db.Uuid
+  product_id String?   @db.Uuid
+  quantity   Int
+  numeric_id Int       @unique @default(autoincrement())
+  products   products? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model categories {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique @db.VarChar(100)
+  numeric_id Int        @unique @default(autoincrement())
+  products   products[]
+}
+
+model order_items {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id   String?   @db.Uuid
+  product_id String?   @db.Uuid
+  quantity   Int
+  unit_price Decimal   @db.Decimal(10, 2)
+  numeric_id Int       @unique @default(autoincrement())
+  orders     orders?   @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  products   products? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model orders {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String?       @db.Uuid
+  total_price Decimal       @db.Decimal(10, 2)
+  status      order_status? @default(pending)
+  created_at  DateTime?     @default(now()) @db.Timestamp(6)
+  numeric_id  Int           @unique @default(autoincrement())
+  order_items order_items[]
+  users       users?        @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model products {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String        @db.VarChar(200)
+  description String?
+  price       Decimal       @db.Decimal(10, 2)
+  image_url   String?
+  stock       Int?          @default(0)
+  created_at  DateTime?     @default(now()) @db.Timestamp(6)
+  category_id Int?
+  numeric_id  Int           @unique @default(autoincrement())
+  cart_items  cart_items[]
+  order_items order_items[]
+  category    categories?   @relation(fields: [category_id], references: [id])
+}
+
+model users {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String       @db.VarChar(100)
+  email               String       @unique @db.VarChar(150)
+  password_hash       String
+  role                user_role?   @default(user)
+  created_at          DateTime?    @default(now()) @db.Timestamp(6)
+  numeric_id          Int          @unique @default(autoincrement())
+  profile_picture_url String?
+  cart_items          cart_items[]
+  orders              orders[]
+}
+
+enum order_status {
+  pending
+  paid
+  shipped
+}
+
+enum user_role {
+  user
+  admin
+}
