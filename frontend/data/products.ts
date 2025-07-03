@@ -1,5 +1,5 @@
 // data/products.ts
-import { Product } from "@/frontend/types/product";
+import { Product } from "@/types/product";
 
 // URL ของ backend API
 const API_URL = "http://localhost:8080"; // หรือ URL ที่ deploy แล้ว

@@ -1,5 +1,5 @@
 import { fetchProducts } from "@/data/products";
-import { Product } from "@frontend/data/products";
+// import { Product } from "@/types/products";
 import ProductsClient from "./products-client";
 import { Suspense } from "react";
 
