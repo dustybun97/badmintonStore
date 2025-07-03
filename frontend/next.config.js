@@ -1,10 +1,15 @@
+const path = require("path");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  eslint: {
-    ignoreDuringBuilds: true,
+  webpack(config) {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      "@/frontend": path.resolve(__dirname, "frontend"),
+      "@": path.resolve(__dirname),
+    };
+    return config;
   },
-  images: { unoptimized: true },
 };
 
 module.exports = nextConfig;
